@@ -25,19 +25,22 @@ import { Sidebar } from '../../components/Sidebar';
 
 import { QueryClient, useQuery } from 'react-query';
 import { api } from '../../services/api';
-import { useUsers } from '../../services/hooks/useUsers';
+import { getUsers, useUsers } from '../../services/hooks/useUsers';
 import { queryClient } from '../../services/queryClient';
+import { GetServerSideProps } from 'next';
 
-export default function Userlist() {
+export default function Userlist(/*{ users }*/) {
     const [page, setPage] = useState(1);
-    const { data, isLoading, error, isFetched } = useUsers(page);
+    const { data, isLoading, error, isFetched } = useUsers(page/*, {
+        initialData: users
+    }*/);
 
     const isWideVersion = useBreakpointValue({
         base: false,
         lg: true,
     });
 
-    async function handlePrefetchUser(userId: number) {
+    async function handlePrefetchUser(userId: string) {
         await queryClient.prefetchQuery(['user', userId], async () => {
             const response = await api.get(`users/${userId}`)
 
@@ -161,3 +164,14 @@ export default function Userlist() {
         </Box>
     );
 }
+
+// export const getServerSideProps: GetServerSideProps = async () => {
+//     const { users, totalCount } = await getUsers(1);
+
+//     return {
+//         props: {
+//             users, 
+//             totalCount
+//         }
+//     }
+// }
